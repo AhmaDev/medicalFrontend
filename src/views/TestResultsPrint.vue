@@ -2,8 +2,6 @@
   <div id="resultPrint" class="pa-10">
     <v-sheet id="printableArea" dir="ltr" v-if="patient != null" class="pa-10">
       <br />
-      <hr />
-      <br />
       <v-row>
         <v-col>
           <div>
@@ -19,11 +17,6 @@
           <div><b>Total Tests :</b> {{ patientTest.content.length }}</div>
         </v-col>
         <v-col>
-          <div>
-            <b>Sample No. :</b>
-            {{ patientTest.idPatientTest }}
-          </div>
-          <div><b>Patient No. :</b> {{ patient.idPatient }}</div>
           <div><b>Sample Date :</b> {{ patientTest.creationFixedDate }}</div>
           <div><b>Sample Time :</b> {{ patientTest.creationFixedTime }}</div>
         </v-col>
@@ -34,14 +27,13 @@
           ></qr-code>
         </v-col>
       </v-row>
-      <br />
-      <hr />
+
       <br />
       <table width="100%">
         <thead>
           <tr>
-            <td>Laboratory Test Result</td>
-            <td>Conventional Units</td>
+            <td>Test</td>
+            <td>Result</td>
             <td>Normal Range</td>
           </tr>
         </thead>
@@ -111,11 +103,6 @@
       </table>
       <br />
       <br />
-      <center>
-        <b style="color: red; font-size: 12px">
-          المختبر خاضع لفحوصات السيطرة النوعية الداخلية والخارجية
-        </b>
-      </center>
     </v-sheet>
   </div>
 </template>
