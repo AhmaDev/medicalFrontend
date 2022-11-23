@@ -42,7 +42,7 @@
           <tr>
             <td>Laboratory Test Result</td>
             <td>Conventional Units</td>
-            <td>SI Units</td>
+            <td>Normal Range</td>
           </tr>
         </thead>
         <tbody>
@@ -52,32 +52,60 @@
           >
             <td>
               {{ tests.filter((e) => e.idTest == test.testId)[0].testName }}
-              <br />
-              Normal Range :
             </td>
-            <td>
-              <span
-                :class="[
-                  test.testResult <
-                  tests.filter((e) => e.idTest == test.testId)[0].rangeFrom
-                    ? 'notInRange'
-                    : '',
-                  ,
-                  test.testResult >
-                  tests.filter((e) => e.idTest == test.testId)[0].rangeTo
-                    ? 'notInRange'
-                    : '',
-                ]"
-                >{{ test.testResult }}</span
+            <td>{{ test.testResult }}</td>
+            <td v-if="patient.sex == 'male'">
+              <template
+                v-if="
+                  tests.filter((e) => e.idTest == test.testId)[0].male
+                    .rangeFrom == 0 &&
+                  tests.filter((e) => e.idTest == test.testId)[0].male
+                    .rangeTo == 0
+                "
               >
-              &nbsp; &nbsp; &nbsp;
-              {{ tests.filter((e) => e.idTest == test.testId)[0].unit }}
-              <br />
-              ({{ tests.filter((e) => e.idTest == test.testId)[0].rangeFrom }} -
-              {{ tests.filter((e) => e.idTest == test.testId)[0].rangeTo }})
-              {{ tests.filter((e) => e.idTest == test.testId)[0].unit }}
+                <pre
+                  >{{
+                    tests.filter((e) => e.idTest == test.testId)[0].male.notice
+                  }}
+                </pre>
+              </template>
+              <template v-else>
+                ({{
+                  tests.filter((e) => e.idTest == test.testId)[0].male.rangeFrom
+                }}
+                -
+                {{
+                  tests.filter((e) => e.idTest == test.testId)[0].male.rangeTo
+                }})
+                {{ tests.filter((e) => e.idTest == test.testId)[0].unit }}
+              </template>
             </td>
-            <td></td>
+            <td v-if="patient.sex == 'female'">
+              <template
+                v-if="
+                  tests.filter((e) => e.idTest == test.testId)[0].female
+                    .rangeFrom == 0 &&
+                  tests.filter((e) => e.idTest == test.testId)[0].female
+                    .rangeTo == 0
+                "
+              >
+                <pre>{{
+                  tests.filter((e) => e.idTest == test.testId)[0].female.notice
+                }}</pre>
+              </template>
+              <template v-else>
+                ({{
+                  tests.filter((e) => e.idTest == test.testId)[0].female
+                    .rangeFrom
+                }}
+                -
+                {{
+                  tests.filter((e) => e.idTest == test.testId)[0].female
+                    .rangeTo
+                }})
+                {{ tests.filter((e) => e.idTest == test.testId)[0].unit }}
+              </template>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -120,7 +148,7 @@ export default {
           .then((res) => {
             this.patient = res.data;
             setTimeout(() => {
-              window.print();
+              // window.print();
             }, 1000);
           });
       });

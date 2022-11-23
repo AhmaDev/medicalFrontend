@@ -18,14 +18,30 @@
         <v-col cols="3">
           <v-autocomplete
             outlined
-            :items="tests"
+            :items="testGroups"
+            item-text="testGroupName"
+            item-value="idTestGroup"
+            v-model="selectedTestGroupId"
+            dense
+            @change="selectGroup($event)"
+            hide-details
+            label="اختيار المجموعة"
+          ></v-autocomplete>
+        </v-col>
+        <v-col cols="3">
+          <v-autocomplete
+            outlined
+            :items="tests.filter((e) => e.testGroupId == selectedTestGroupId)"
             item-text="testName"
             item-value="idTest"
+            @change="showValue()"
             v-model="selectedTestId"
             dense
+            multiple
             hide-details
             label="اختيار فحص"
-          ></v-autocomplete>
+          >
+          </v-autocomplete>
         </v-col>
         <v-col cols="2">
           <v-btn @click="addTest()" color="success">اضافة</v-btn>
@@ -80,7 +96,9 @@
 export default {
   data: () => ({
     tests: [],
-    selectedTestId: 0,
+    testGroups: [],
+    selectedTestId: [],
+    selectedTestGroupId: 0,
     addPatientTestLoading: false,
     patient: {
       patientName: "",
@@ -96,12 +114,16 @@ export default {
         .get("patients/" + this.$route.params.id)
         .then((res) => (this.patient = res.data));
       this.$axios.get("tests").then((res) => (this.tests = res.data));
+      this.$axios.get("testGroups").then((res) => (this.testGroups = res.data));
     },
     addTest() {
-      this.patientTests.push({
-        testId: this.selectedTestId,
-        amount: 0,
-      });
+      for (let i = 0; i < this.selectedTestId.length; i++) {
+        const test = this.selectedTestId[i];
+        this.patientTests.push({
+          testId: test,
+          amount: this.tests.filter((e) => e.idTest == test)[0].price,
+        });
+      }
     },
     total() {
       let total = 0;
@@ -130,6 +152,15 @@ export default {
           this.$toasted.error("حدث خطأ ما");
         })
         .finally(() => (this.addPatientTestLoading = false));
+    },
+    selectGroup(id) {
+      this.selectedTestId = this.tests
+        .filter((e) => e.testGroupId == id)
+        .map((e) => e.idTest);
+      console.log(this.selectedTestId);
+    },
+    showValue() {
+      console.log(this.selectedTestId);
     },
   },
 };

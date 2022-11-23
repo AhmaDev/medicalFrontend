@@ -12,8 +12,7 @@
         <span>طباعة</span>
       </v-btn>
     </v-app-bar>
-
-    <v-card class="pa-10">
+    <v-card v-if="patientInfo != null" class="pa-10">
       <br />
       <hr />
       <v-simple-table>
@@ -43,10 +42,57 @@
                 @change="editResult(test.idPatientTestContent, $event)"
               ></v-text-field>
             </td>
-            <td>
-              ({{ tests.filter((e) => e.idTest == test.testId)[0].rangeFrom }} -
-              {{ tests.filter((e) => e.idTest == test.testId)[0].rangeTo }})
-              {{ tests.filter((e) => e.idTest == test.testId)[0].unit }}
+            <td v-if="patientInfo.sex == 'male'">
+              <template
+                v-if="
+                  tests.filter((e) => e.idTest == test.testId)[0].male
+                    .rangeFrom == 0 &&
+                  tests.filter((e) => e.idTest == test.testId)[0].male
+                    .rangeTo == 0
+                "
+              >
+                <pre>
+                  {{
+                    tests.filter((e) => e.idTest == test.testId)[0].male.notice
+                  }}
+                </pre>
+              </template>
+              <template v-else>
+                ({{
+                  tests.filter((e) => e.idTest == test.testId)[0].male.rangeFrom
+                }}
+                -
+                {{
+                  tests.filter((e) => e.idTest == test.testId)[0].male.rangeTo
+                }})
+                {{ tests.filter((e) => e.idTest == test.testId)[0].unit }}
+              </template>
+            </td>
+            <td v-if="patientInfo.sex == 'female'">
+              <template
+                v-if="
+                  tests.filter((e) => e.idTest == test.testId)[0].female
+                    .rangeFrom == 0 &&
+                  tests.filter((e) => e.idTest == test.testId)[0].female
+                    .rangeTo == 0
+                "
+              >
+                <pre>{{
+                  tests.filter((e) => e.idTest == test.testId)[0].female.notice
+                }}</pre>
+              </template>
+              <template v-else>
+                ({{
+                  tests.filter((e) => e.idTest == test.testId)[0].female
+                    .rangeFrom
+                }}
+                -
+                {{
+                  tests.filter((e) => e.idTest == test.testId)[0].female
+                    .rangeTo
+                }})
+                {{ tests.filter((e) => e.idTest == test.testId)[0].unit }}
+              </template>
             </td>
             <td></td>
           </tr>
@@ -60,6 +106,7 @@
 export default {
   data: () => ({
     tests: [],
+    patientInfo: null,
     selectedTestId: 0,
     addPatientTestLoading: false,
     patientTest: {},
@@ -70,9 +117,12 @@ export default {
   },
   methods: {
     fetch() {
-      this.$axios
-        .get("patientTests/" + this.$route.params.id)
-        .then((res) => (this.patientTest = res.data));
+      this.$axios.get("patientTests/" + this.$route.params.id).then((res) => {
+        this.patientTest = res.data;
+        this.$axios
+          .get("patients/" + this.patientTest.patientId)
+          .then((res) => (this.patientInfo = res.data));
+      });
       this.$axios.get("tests").then((res) => (this.tests = res.data));
     },
     addTest() {
